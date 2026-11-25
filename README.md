@@ -85,11 +85,6 @@ python navegacion\main.py
 * La web solo escucha en `127.0.0.1` y no tiene autenticación: no la expongas a la red.
 * `teleoperacion` no tiene parada automática si se pierde la conexión (ver sus mejoras propuestas).
 
-## Nota sobre `temario/`
-
-La carpeta `temario/` (apuntes de la asignatura y el PDF de instrucciones del Roomba) está en `.gitignore`: es
-material con copyright de la Universidad de Salamanca y solo se conserva en local. Los documentos
-mencionan los temas del curso sin enlazar a esos archivos.
 
 ## Licencia
 
