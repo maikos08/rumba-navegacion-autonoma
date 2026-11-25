@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odometría Create 2</title>
+<link rel="stylesheet" href="/static/base.css">
+</head>
+<body>
+<header>
+  <div id="coords">x = 0.0 mm · y = 0.0 mm · θ = 0.0°</div>
+  <div>
+    <button data-c="a">◀ A</button>
+    <button data-c="w">▲ W</button>
+    <button data-c="d">D ▶</button>
+    <button data-c="p" class="activo">Parar (espacio)</button>
+    <button data-c="q">Salir (Q)</button>
+  </div>
+  <span id="conexion"></span>
+</header>
+<canvas id="mapa"></canvas>
+<script src="/static/mapa.js"></script>
+<script>
+const mapa = new Mapa($('mapa'));
+let camino = [];
+let pose = { x: 0, y: 0, theta: 0 };
+let activo = 'p';
+
+function enviar(c) {
+  post('/cmd?c=' + c);
+  if (c !== 'q') { activo = c; marcar(); }
+}
+function marcar() {
+  document.querySelectorAll('button[data-c]').forEach(b =>
+    b.classList.toggle('activo', b.dataset.c === activo));
+}
+document.querySelectorAll('button[data-c]').forEach(b => b.onclick = () => enviar(b.dataset.c));
+
+const teclas = { w: 'w', a: 'a', d: 'd', ' ': 'p', q: 'q' };
+addEventListener('keydown', e => {
+  const c = teclas[e.key.toLowerCase()];
+  if (c) { e.preventDefault(); if (!e.repeat) enviar(c); }
+});
+
+function dibujar() {
+  mapa.preparar(camino.concat([[pose.x, pose.y]]));
+  mapa.camino(camino, pose);
+  mapa.punto([0, 0], '#16a34a', 5);
+  mapa.robot(pose);
+}
+
+iniciarSondeo({
+  alRecibir(d, c) {
+    camino = c; pose = d;
+    $('coords').textContent =
+      `x = ${d.x.toFixed(1)} mm · y = ${d.y.toFixed(1)} mm · θ = ${gradosDe(d.theta).toFixed(1)}°`;
+    $('conexion').textContent = '';
+    dibujar();
+  },
+  alFallar() { $('conexion').textContent = 'Sin conexión con el programa'; dibujar(); },
+});
+addEventListener('resize', dibujar);
+</script>
+</body>
+</html>

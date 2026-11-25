@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navegación Create 2</title>
+<link rel="stylesheet" href="/static/base.css">
+</head>
+<body>
+<header>
+  <div id="coords">x = 0.000 m · y = 0.000 m · θ = 0.0°</div>
+  <div>Estado: <span id="estado">Sin objetivo</span></div>
+  <form id="form">
+    x <input id="ox" type="number" step="0.1" value="1">
+    y <input id="oy" type="number" step="0.1" value="0">
+    m <button class="prim" type="submit">Ir</button>
+  </form>
+  <button id="parar">Parar</button>
+  <button id="salir">Salir</button>
+  <span id="ayuda">o haz clic en el mapa · x adelante, y izquierda</span>
+  <span id="conexion"></span>
+</header>
+<canvas id="mapa" class="clicable"></canvas>
+<script src="/static/mapa.js"></script>
+<script>
+const mapa = new Mapa($('mapa'));
+let camino = [];
+let datos = { x: 0, y: 0, theta: 0, objetivo: null, estado: 'Sin objetivo' };
+
+function irA(xm, ym) {   // coordenadas en metros
+  xm = r2(xm); ym = r2(ym);
+  $('ox').value = xm;
+  $('oy').value = ym;
+  post(`/objetivo?x=${xm}&y=${ym}`);
+}
+$('form').onsubmit = e => { e.preventDefault(); irA(+$('ox').value, +$('oy').value); };
+$('parar').onclick = () => post('/cmd?c=p');
+$('salir').onclick = () => post('/cmd?c=q');
+$('mapa').addEventListener('click', e => {
+  const p = mapa.clicAMetros(e);
+  if (p) irA(p[0], p[1]);
+});
+
+function dibujar() {
+  // Encuadre automático: camino + robot + objetivo
+  const pts = camino.concat([[datos.x, datos.y]]);
+  if (datos.objetivo) pts.push(datos.objetivo);
+  mapa.preparar(pts);
+  const [rx, ry] = mapa.aPx(datos.x, datos.y);
+
+  // Objetivo: aspa naranja + línea discontinua desde el robot
+  if (datos.objetivo) {
+    mapa.linea([[datos.x, datos.y], datos.objetivo], { color: '#ea580c', guiones: [6, 5] });
+    mapa.aspa(datos.objetivo);
+  }
+  mapa.camino(camino, datos);
+  mapa.punto([0, 0], '#16a34a', 5);
+  mapa.robot(datos);
+}
+
+iniciarSondeo({
+  alRecibir(d, c) {
+    camino = c; datos = d;
+    $('coords').textContent =
+      `x = ${(d.x / 1000).toFixed(3)} m · y = ${(d.y / 1000).toFixed(3)} m · θ = ${gradosDe(d.theta).toFixed(1)}°`;
+    $('estado').textContent = d.estado;
+    $('conexion').textContent = '';
+    dibujar();
+  },
+  alFallar() { $('conexion').textContent = 'Sin conexión con el programa'; dibujar(); },
+});
+addEventListener('resize', dibujar);
+</script>
+</body>
+</html>

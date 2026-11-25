@@ -1,0 +1,23 @@
+/* Estilos comunes de las páginas con cabecera + mapa (teleoperación, navegación, obstáculos). */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f6f6f4;
+       color: #222; display: flex; flex-direction: column; height: 100vh; }
+header { display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+         padding: 8px 16px; background: #fff; border-bottom: 1px solid #ddd; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 14px; }
+#coords { font-family: ui-monospace, Consolas, monospace; font-size: 15px; min-width: 330px; }
+#estado { font-weight: 600; }
+form { display: flex; gap: 6px; align-items: center; }
+input { width: 80px; padding: 5px 6px; font-size: 14px; border: 1px solid #bbb; border-radius: 6px; }
+button { padding: 6px 12px; font-size: 14px; border: 1px solid #bbb; border-radius: 6px;
+         background: #fff; cursor: pointer; }
+button.prim { background: #2563eb; color: #fff; border-color: #2563eb; }
+button.activo { background: #2563eb; color: #fff; border-color: #2563eb; }
+#conexion { color: #dc2626; font-size: 14px; }
+#ayuda { color: #777; font-size: 13px; }
+.leyenda { color: #666; font-size: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
+.leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px;
+             vertical-align: -1px; }
+canvas { flex: 1; width: 100%; display: block; }
+canvas.clicable { cursor: crosshair; }
+button:disabled { opacity: .5; cursor: default; }

@@ -1,0 +1,8 @@
+name: create2
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - pycreate2==0.8.0   # arrastra pyserial, colorama y simplejson

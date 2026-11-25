@@ -1,0 +1,1 @@
+pycreate2==0.8.0   # arrastra pyserial, colorama y simplejson

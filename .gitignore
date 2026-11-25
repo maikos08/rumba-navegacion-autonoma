@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Entornos y exportaciones locales (contienen rutas de tu usuario)
+.venv/
+environment_completo.yml
+environment_minimo.yml
+
+# Copia de seguridad del código original previo al refactor (solo local)
+backup_originales/
+
+# Apuntes de la asignatura (material con copyright de la Universidad, solo local)
+temario/
+
+# Editor / herramientas
+.vscode/
+.idea/
+.claude/

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exploración Create 2</title>
+<link rel="stylesheet" href="/static/base.css">
+</head>
+<body>
+<header>
+  <div id="coords">x = 0.000 m · y = 0.000 m · θ = 0.0°</div>
+  <div>Modo: <b id="modo"></b> · Estado: <span id="estado">-</span> · Choques: <span id="choques">0</span></div>
+  <button id="iniciar" class="prim">▶ Iniciar</button>
+  <button id="parar">■ Parar</button>
+  <button id="salir">Salir</button>
+  <div id="ir" class="mono">IR: -</div>
+  <div class="leyenda"><span><i style="background:#2563eb"></i>recorrido</span><span><i style="background:#111"></i>choque</span></div>
+  <span id="conexion"></span>
+</header>
+<canvas id="mapa"></canvas>
+<script src="/static/mapa.js"></script>
+<script>
+const mapa = new Mapa($('mapa'));
+let camino = [];
+let datos = { x: 0, y: 0, theta: 0, obstaculos: [] };
+
+$('iniciar').onclick = () => post('/cmd?c=iniciar');
+$('parar').onclick = () => post('/cmd?c=parar');
+$('salir').onclick = () => { if (confirm('¿Parar el robot y cerrar el programa?')) post('/cmd?c=q'); };
+
+function dibujar() {
+  mapa.preparar(camino.concat([[datos.x, datos.y]], datos.obstaculos));
+  mapa.camino(camino, datos);
+  for (const p of datos.obstaculos) mapa.punto(p, '#111', 4);
+  mapa.punto([0, 0], '#16a34a', 5);
+  mapa.robot(datos);
+}
+
+iniciarSondeo({
+  alRecibir(d, c) {
+    camino = c; datos = d;
+    $('coords').textContent =
+      `x = ${(d.x / 1000).toFixed(3)} m · y = ${(d.y / 1000).toFixed(3)} m · θ = ${gradosDe(d.theta).toFixed(1)}°`;
+    $('modo').textContent = d.modo;
+    $('estado').textContent = d.estado;
+    $('choques').textContent = d.choques;
+    $('ir').textContent = 'IR (izq→der): ' + d.ir.join(' ');
+    $('iniciar').disabled = d.activo;
+    $('conexion').textContent = '';
+    dibujar();
+  },
+  alFallar() { $('conexion').textContent = 'Sin conexión con el programa'; dibujar(); },
+});
+addEventListener('resize', dibujar);
+</script>
+</body>
+</html>
